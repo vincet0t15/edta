@@ -11,7 +11,11 @@ import {
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { DocumentCategory, DocumentCategoryCreateRequest } from '@/types/document-category';
+import documentCategories from '@/routes/document-categories';
+import type {
+    DocumentCategory,
+    DocumentCategoryCreateRequest,
+} from '@/types/document-category';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
@@ -22,13 +26,18 @@ interface EditDocumentCategoryDialogProps {
     category: DocumentCategory;
 }
 
-export function EditDocumentCategoryDialog({ isOpen, onClose, category }: EditDocumentCategoryDialogProps) {
-    const { data, setData, put, reset, errors, processing } = useForm<DocumentCategoryCreateRequest>({
-        code: category.code,
-        name: category.name,
-        description: category.description || '',
-        order: category.order,
-    });
+export function EditDocumentCategoryDialog({
+    isOpen,
+    onClose,
+    category,
+}: EditDocumentCategoryDialogProps) {
+    const { data, setData, put, reset, errors, processing } =
+        useForm<DocumentCategoryCreateRequest>({
+            code: category.code,
+            name: category.name,
+            description: category.description || '',
+            order: category.order,
+        });
 
     const onChangeInput: ChangeEventHandler<HTMLInputElement> = (e) => {
         const { name, value } = e.target;
@@ -40,7 +49,7 @@ export function EditDocumentCategoryDialog({ isOpen, onClose, category }: EditDo
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('document-categories.update', category.id), {
+        put(documentCategories.update(category.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();
@@ -51,34 +60,65 @@ export function EditDocumentCategoryDialog({ isOpen, onClose, category }: EditDo
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-sm rounded-md">
+            <DialogContent className="rounded-md sm:max-w-sm">
                 <form onSubmit={onSubmit}>
                     <DialogHeader className="mb-4">
                         <DialogTitle>Edit Document Category</DialogTitle>
                         <DialogDescription className="text-xs">
-                            Update the document category details by providing the required information. This will update the system records.
+                            Update the document category details by providing
+                            the required information. This will update the
+                            system records.
                         </DialogDescription>
                     </DialogHeader>
                     <div>
                         <Field>
                             <Label htmlFor="code">Code</Label>
-                            <Input name="code" placeholder="e.g. REPORT" onChange={onChangeInput} value={data.code} />
-                            <span className="text-orange-600">{errors.code}</span>
+                            <Input
+                                name="code"
+                                placeholder="e.g. REPORT"
+                                onChange={onChangeInput}
+                                value={data.code}
+                            />
+                            <span className="text-orange-600">
+                                {errors.code}
+                            </span>
                         </Field>
                         <Field>
                             <Label htmlFor="name">Name</Label>
-                            <Input name="name" placeholder="e.g. Report" onChange={onChangeInput} value={data.name} />
-                            <span className="text-orange-600">{errors.name}</span>
+                            <Input
+                                name="name"
+                                placeholder="e.g. Report"
+                                onChange={onChangeInput}
+                                value={data.name}
+                            />
+                            <span className="text-orange-600">
+                                {errors.name}
+                            </span>
                         </Field>
                         <Field>
                             <Label htmlFor="description">Description</Label>
-                            <Input name="description" placeholder="e.g. Official reports" onChange={onChangeInput} value={data.description} />
-                            <span className="text-orange-600">{errors.description}</span>
+                            <Input
+                                name="description"
+                                placeholder="e.g. Official reports"
+                                onChange={onChangeInput}
+                                value={data.description}
+                            />
+                            <span className="text-orange-600">
+                                {errors.description}
+                            </span>
                         </Field>
                         <Field>
                             <Label htmlFor="order">Order</Label>
-                            <Input name="order" type="number" placeholder="e.g. 1" onChange={onChangeInput} value={data.order || ''} />
-                            <span className="text-orange-600">{errors.order}</span>
+                            <Input
+                                name="order"
+                                type="number"
+                                placeholder="e.g. 1"
+                                onChange={onChangeInput}
+                                value={data.order || ''}
+                            />
+                            <span className="text-orange-600">
+                                {errors.order}
+                            </span>
                         </Field>
                     </div>
                     <DialogFooter>
