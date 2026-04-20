@@ -26,6 +26,14 @@ export default function Login({
         <>
             <Head title="Log in" />
 
+            {status && (
+                <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4">
+                    <p className="text-sm font-medium text-green-800">
+                        {status}
+                    </p>
+                </div>
+            )}
+
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
@@ -35,33 +43,21 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="username">Username</Label>
                                 <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
+                                    id="username"
+                                    type="text"
+                                    name="username"
                                     required
                                     autoFocus
                                     tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
+                                    autoComplete="username"
+                                    placeholder="username"
                                 />
-                                <InputError message={errors.email} />
+                                <InputError message={errors.username} />
                             </div>
 
                             <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
-                                </div>
                                 <PasswordInput
                                     id="password"
                                     name="password"
@@ -105,12 +101,6 @@ export default function Login({
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }

@@ -30,6 +30,10 @@ class FortifyServiceProvider extends ServiceProvider
     {
         $this->configureActions();
         $this->configureViews();
+
+        // Use username instead of email for authentication
+        Fortify::username('username');
+
         $this->configureRateLimiting();
     }
 

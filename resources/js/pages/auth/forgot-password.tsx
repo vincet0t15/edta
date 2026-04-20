@@ -21,21 +21,21 @@ export default function ForgotPassword({ status }: { status?: string }) {
             )}
 
             <div className="space-y-6">
-                <Form {...email.form()}>
+                <Form {...email.form()} transform={(data)=>({login: data.login})}>
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">Username or email</Label>
                                 <Input
                                     id="email"
-                                    type="email"
-                                    name="email"
+                                    type="text"
+                                    name="login"
                                     autoComplete="off"
                                     autoFocus
-                                    placeholder="email@example.com"
+                                    placeholder="username or email"
                                 />
 
-                                <InputError message={errors.email} />
+                                <InputError message={errors.login} />
                             </div>
 
                             <div className="my-6 flex items-center justify-start">

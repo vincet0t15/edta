@@ -20,14 +20,19 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         Validator::make($input, [
-            ...$this->profileRules(),
+            'name' => $this->nameRules(),
+            'username' => $this->usernameRules(),
             'password' => $this->passwordRules(),
         ])->validate();
 
+        // If the frontend does not provide an email, generate a unique placeholder
+        $email = $input['email'] ?? ($input['username'] . '@no-email.local');
+
         return User::create([
             'name' => $input['name'],
-            'email' => $input['email'],
+            'username' => $input['username'],
             'password' => $input['password'],
+            'is_active' => false, // Set to false by default, admin can activate later
         ]);
     }
 }
