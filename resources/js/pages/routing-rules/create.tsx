@@ -23,8 +23,9 @@ import type { RoutingRuleCreateRequest } from '@/types/routing-rule';
 import type { DocumentType } from '@/types/document-type';
 import type { Office } from '@/types/office';
 import { useForm } from '@inertiajs/react';
-import type { ChangeEventHandler, FormEventHandler } from 'react';
+import type { ChangeEventHandler, SubmitEventHandler } from 'react';
 import { toast } from 'sonner';
+import routingRules from '@/routes/routing-rules';
 
 interface CreateRoutingRuleDialogProps {
     isOpen: boolean;
@@ -55,9 +56,9 @@ export function CreateRoutingRuleDialog({
         setData({ ...data, [e.target.name]: value });
     };
 
-    const onSubmit: FormEventHandler = (e) => {
+    const onSubmit: SubmitEventHandler = (e) => {
         e.preventDefault();
-        post('routing-rules.store', {
+        post(routingRules.store().url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

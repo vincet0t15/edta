@@ -12,6 +12,8 @@ import type { DocumentType } from '@/types/document-type.d';
 import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+import documentTypes from '@/routes/document-types';
+
 interface DeleteDocumentTypeProps {
     isOpen: boolean;
     onClose: () => void;
@@ -20,7 +22,7 @@ interface DeleteDocumentTypeProps {
 
 export function DeleteDocumentType({ isOpen, onClose, documentType }: DeleteDocumentTypeProps) {
     const onSubmit = () => {
-        router.delete(route('document-types.destroy', documentType.id), {
+        router.delete(documentTypes.destroy(documentType.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

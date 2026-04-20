@@ -28,6 +28,7 @@ import type { Office } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
+import routingRules from '@/routes/routing-rules';
 
 interface EditRoutingRuleDialogProps {
     isOpen: boolean;
@@ -62,7 +63,7 @@ export function EditRoutingRuleDialog({
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(('routing-rules.update', routingRule.id), {
+        put(routingRules.update(routingRule.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

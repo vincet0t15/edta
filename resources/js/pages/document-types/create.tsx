@@ -16,6 +16,7 @@ import type { DocumentTypeCreateRequest } from '@/types/document-type.d';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
+import documentTypes from '@/routes/document-types';
 
 interface CreateDocumentTypeProps {
     isOpen: boolean;
@@ -35,7 +36,7 @@ export function CreateDocumentType({ isOpen, onClose }: CreateDocumentTypeProps)
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('document-types.store'), {
+        post(documentTypes.store().url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

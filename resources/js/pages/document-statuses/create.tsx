@@ -15,6 +15,7 @@ import type { DocumentStatusCreateRequest } from '@/types/document-status';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
+import documentStatuses from '@/routes/document-statuses';
 
 interface CreateDocumentStatusDialogProps {
     isOpen: boolean;
@@ -40,7 +41,7 @@ export function CreateDocumentStatusDialog({ isOpen, onClose }: CreateDocumentSt
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('document-statuses.store'), {
+        post(documentStatuses.store().url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

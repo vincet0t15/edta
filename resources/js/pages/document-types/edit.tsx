@@ -19,6 +19,7 @@ import type {
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, SubmitEventHandler } from 'react';
 import { toast } from 'sonner';
+import documentTypes from '@/routes/document-types';
 
 interface EditDocumentTypeProps {
     isOpen: boolean;
@@ -46,7 +47,7 @@ export function EditDocumentType({
 
     const onSubmit: SubmitEventHandler = (e) => {
         e.preventDefault();
-        put(route('document-types.update', documentType.id), {
+        put(documentTypes.update(documentType.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

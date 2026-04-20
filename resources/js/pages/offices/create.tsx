@@ -15,6 +15,7 @@ import type { OfficeCreateRequest } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
+import offices from '@/routes/offices';
 
 interface CreateOfficeDialogProps {
     isOpen: boolean;
@@ -33,7 +34,7 @@ export function CreateOfficeDialog({ isOpen, onClose }: CreateOfficeDialogProps)
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('offices.store'), {
+        post(offices.store().url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

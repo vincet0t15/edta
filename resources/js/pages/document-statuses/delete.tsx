@@ -12,6 +12,8 @@ import type { DocumentStatus } from '@/types/document-status';
 import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+import documentStatuses from '@/routes/document-statuses';
+
 interface DeleteDocumentStatusDialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -20,7 +22,7 @@ interface DeleteDocumentStatusDialogProps {
 
 export function DeleteDocumentStatusDialog({ isOpen, onClose, status }: DeleteDocumentStatusDialogProps) {
     const onSubmit = () => {
-        router.delete(route('document-statuses.destroy', status.id), {
+        router.delete(documentStatuses.destroy(status.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

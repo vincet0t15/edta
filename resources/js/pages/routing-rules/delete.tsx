@@ -8,6 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import routingRules from '@/routes/routing-rules';
 import type { RoutingRule } from '@/types/routing-rule';
 import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -24,7 +25,7 @@ export function DeleteRoutingRuleDialog({
     routingRule,
 }: DeleteRoutingRuleDialogProps) {
     const onSubmit = () => {
-        router.delete(('routing-rules.destroy', routingRule.id), {
+        router.delete(routingRules.destroy(routingRule.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

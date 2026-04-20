@@ -16,6 +16,8 @@ import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
 
+import documentStatuses from '@/routes/document-statuses';
+
 interface EditDocumentStatusDialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -41,7 +43,7 @@ export function EditDocumentStatusDialog({ isOpen, onClose, status }: EditDocume
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('document-statuses.update', status.id), {
+        put(documentStatuses.update(status.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();
