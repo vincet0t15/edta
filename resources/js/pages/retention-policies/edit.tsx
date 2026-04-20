@@ -158,7 +158,12 @@ export function EditRetentionPolicyDialog({
                                 id="is_permanent"
                                 name="is_permanent"
                                 checked={data.is_permanent}
-                                onChange={onChangeInput}
+                                onCheckedChange={(checked) =>
+                                    setData({
+                                        ...data,
+                                        is_permanent: Boolean(checked),
+                                    })
+                                }
                             />
                             <Label
                                 htmlFor="is_permanent"
