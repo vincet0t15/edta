@@ -16,8 +16,17 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
+            'username' => 'testuser',
             'name' => 'Test User',
             'email' => 'test@example.com',
+        ]);
+
+        // Seed document tracking configuration data
+        $this->call([
+            DocumentStatusSeeder::class,
+            DocumentPrioritySeeder::class,
+            DocumentCategorySeeder::class,
+            RetentionPolicySeeder::class,
         ]);
     }
 }

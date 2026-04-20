@@ -15,3 +15,5 @@ Route::middleware(['auth', 'verified', 'check-account-active'])->group(function 
 // Load authentication routes
 require __DIR__ . '/auth.php';
 require __DIR__ . '/settings.php';
+require __DIR__ . '/offices.php';
+require __DIR__ . '/document-types.php';
