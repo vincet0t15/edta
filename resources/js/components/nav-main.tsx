@@ -13,7 +13,6 @@ import { Link } from '@inertiajs/react';
 export function NavMain({ items = [] }: { items: NavGroup[] }) {
     const { isCurrentUrl } = useCurrentUrl();
 
-    // Icon color mapping for better visual appeal
     const getIconColor = (href: NonNullable<InertiaLinkProps['href']>) => {
         const urlKey =
             typeof href === 'string'
@@ -37,15 +36,6 @@ export function NavMain({ items = [] }: { items: NavGroup[] }) {
     return (
         <div className="space-y-3">
             {items.map((group) => {
-                // Get gradient colors for each section title
-                const getSectionGradient = (title: string) => {
-                    const gradientMap: Record<string, string> = {
-                        General: 'from-blue-500 to-cyan-500',
-                        Settings: 'from-slate-500 to-gray-500',
-                    };
-                    return gradientMap[title] || 'from-slate-500 to-gray-500';
-                };
-
                 return (
                     <SidebarGroup key={group.title} className="px-2 py-0">
                         <SidebarGroupLabel className="px-2">
