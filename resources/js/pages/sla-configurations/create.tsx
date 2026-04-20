@@ -24,6 +24,7 @@ import type { DocumentPriority } from '@/types/document-priority';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
+import slaConfigurations from '@/routes/sla-configurations';
 
 interface CreateSLAConfigurationDialogProps {
     isOpen: boolean;
@@ -56,7 +57,7 @@ export function CreateSLAConfigurationDialog({
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('sla-configurations.store'), {
+        post(slaConfigurations.store().url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();
@@ -67,12 +68,14 @@ export function CreateSLAConfigurationDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-sm rounded-md">
+            <DialogContent className="rounded-md sm:max-w-sm">
                 <form onSubmit={onSubmit}>
                     <DialogHeader className="mb-4">
                         <DialogTitle>Create SLA Configuration</DialogTitle>
                         <DialogDescription className="text-xs">
-                            Add a new SLA configuration by providing the required details. This will be included in the system records.
+                            Add a new SLA configuration by providing the
+                            required details. This will be included in the
+                            system records.
                         </DialogDescription>
                     </DialogHeader>
                     <div>
@@ -94,7 +97,10 @@ export function CreateSLAConfigurationDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {documentTypes.map((dt) => (
-                                        <SelectItem key={dt.id} value={dt.id.toString()}>
+                                        <SelectItem
+                                            key={dt.id}
+                                            value={dt.id.toString()}
+                                        >
                                             {dt.name}
                                         </SelectItem>
                                     ))}
@@ -122,7 +128,10 @@ export function CreateSLAConfigurationDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {documentPriorities.map((dp) => (
-                                        <SelectItem key={dp.id} value={dp.id.toString()}>
+                                        <SelectItem
+                                            key={dp.id}
+                                            value={dp.id.toString()}
+                                        >
                                             {dp.label}
                                         </SelectItem>
                                     ))}

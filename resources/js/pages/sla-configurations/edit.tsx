@@ -27,6 +27,7 @@ import type { DocumentPriority } from '@/types/document-priority';
 import { useForm } from '@inertiajs/react';
 import type { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
+import slaConfigurations from '@/routes/sla-configurations';
 
 interface EditSLAConfigurationDialogProps {
     isOpen: boolean;
@@ -61,7 +62,7 @@ export function EditSLAConfigurationDialog({
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(('sla-configurations.update', slaConfiguration.id), {
+        put(slaConfigurations.update(slaConfiguration.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();

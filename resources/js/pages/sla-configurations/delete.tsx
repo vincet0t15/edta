@@ -8,6 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import slaConfigurations from '@/routes/sla-configurations';
 import type { SLAConfiguration } from '@/types/sla-configuration';
 import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -24,7 +25,7 @@ export function DeleteSLAConfigurationDialog({
     slaConfiguration,
 }: DeleteSLAConfigurationDialogProps) {
     const onSubmit = () => {
-        router.delete(('sla-configurations.destroy', slaConfiguration.id), {
+        router.delete(slaConfigurations.destroy(slaConfiguration.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();
