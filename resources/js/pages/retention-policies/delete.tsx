@@ -11,6 +11,7 @@ import {
 import type { RetentionPolicy } from '@/types/retention-policy';
 import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
+import retentionPolicies from '@/routes/retention-policies';
 
 interface DeleteRetentionPolicyDialogProps {
     isOpen: boolean;
@@ -18,9 +19,13 @@ interface DeleteRetentionPolicyDialogProps {
     policy: RetentionPolicy;
 }
 
-export function DeleteRetentionPolicyDialog({ isOpen, onClose, policy }: DeleteRetentionPolicyDialogProps) {
+export function DeleteRetentionPolicyDialog({
+    isOpen,
+    onClose,
+    policy,
+}: DeleteRetentionPolicyDialogProps) {
     const onSubmit = () => {
-        router.delete(route('retention-policies.destroy', policy.id), {
+        router.delete(retentionPolicies.destroy(policy.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();
@@ -32,14 +37,21 @@ export function DeleteRetentionPolicyDialog({ isOpen, onClose, policy }: DeleteR
         <AlertDialog open={isOpen} onOpenChange={onClose}>
             <AlertDialogContent className="rounded-md">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        Are you absolutely sure?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the retention policy <span className="font-bold">{policy.name}</span> from our servers.
+                        This action cannot be undone. This will permanently
+                        delete the retention policy{' '}
+                        <span className="font-bold">{policy.name}</span> from
+                        our servers.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onSubmit}>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={onSubmit}>
+                        Continue
+                    </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

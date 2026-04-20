@@ -53,7 +53,7 @@ export function EditRetentionPolicyDialog({ isOpen, onClose, policy }: EditReten
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('retention-policies.update', policy.id), {
+        put(retentionPolicies.update(policy.id).url, {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
                 onClose();
