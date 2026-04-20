@@ -148,10 +148,10 @@ export function CreateRetentionPolicyDialog({
                                 id="is_permanent"
                                 name="is_permanent"
                                 checked={data.is_permanent}
-                                onChange={(e) =>
+                                onCheckedChange={(checked) =>
                                     setData({
                                         ...data,
-                                        is_permanent: e.target.checked,
+                                        is_permanent: Boolean(checked),
                                     })
                                 }
                             />
