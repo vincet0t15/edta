@@ -22,11 +22,15 @@ interface CreateOfficeDialogProps {
     onClose: () => void;
 }
 
-export function CreateOfficeDialog({ isOpen, onClose }: CreateOfficeDialogProps) {
-    const { data, setData, post, reset, errors, processing } = useForm<OfficeCreateRequest>({
-        name: '',
-        code: '',
-    });
+export function CreateOfficeDialog({
+    isOpen,
+    onClose,
+}: CreateOfficeDialogProps) {
+    const { data, setData, post, reset, errors, processing } =
+        useForm<OfficeCreateRequest>({
+            name: '',
+            code: '',
+        });
 
     const onChangeInput: ChangeEventHandler<HTMLInputElement> = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
@@ -45,26 +49,40 @@ export function CreateOfficeDialog({ isOpen, onClose }: CreateOfficeDialogProps)
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-sm rounded-md">
+            <DialogContent className="rounded-md sm:max-w-sm">
                 <form onSubmit={onSubmit}>
                     <DialogHeader className="mb-4">
                         <DialogTitle>Create Office</DialogTitle>
                         <DialogDescription className="text-xs">
-                            Add a new office by providing the required details. This will be included in the system records.
+                            Add a new office by providing the required details.
+                            This will be included in the system records.
                         </DialogDescription>
                     </DialogHeader>
                     <div>
                         <Field>
                             <Label htmlFor="name">Name</Label>
-                            <Input name="name" placeholder="e.g. Office of the Municipal Mayor" onChange={onChangeInput} />
-                            <span className="text-orange-600">{errors.name}</span>
+                            <Input
+                                name="name"
+                                placeholder="e.g. Office of the Municipal Mayor"
+                                onChange={onChangeInput}
+                            />
+                            <span className="text-orange-600">
+                                {errors.name}
+                            </span>
                         </Field>
                         <Field>
                             <Label htmlFor="code">Code</Label>
-                            <Input name="code" placeholder="e.g. MO" onChange={onChangeInput} />
-                            <span className="text-orange-600">{errors.code}</span>
+                            <Input
+                                name="code"
+                                placeholder="e.g. MO"
+                                onChange={onChangeInput}
+                            />
+                            <span className="text-orange-600">
+                                {errors.code}
+                            </span>
                         </Field>
                     </div>
+
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
