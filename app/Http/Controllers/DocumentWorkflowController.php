@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\DocumentAssignment;
 use App\Models\DocumentLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DocumentWorkflowController extends Controller
@@ -29,7 +30,7 @@ class DocumentWorkflowController extends Controller
                 $assignment = DocumentAssignment::create([
                     'document_id' => $document->id,
                     'office_id' => $request->input('target_office_id'),
-                    'assigned_by' => auth()->id(),
+                    'assigned_by' => Auth::id(),
                     'note' => $request->input('note'),
                     'assigned_at' => now(),
                 ]);
@@ -43,7 +44,7 @@ class DocumentWorkflowController extends Controller
 
             DocumentLog::create([
                 'document_id' => $document->id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'action' => 'transition',
                 'meta' => json_encode(['from' => $from, 'to' => $to, 'assignment_id' => $assignment->id ?? null]),
                 'note' => $request->input('note'),

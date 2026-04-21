@@ -2,39 +2,62 @@
 
 namespace App\Services;
 
-use App\Models\Document;
-use App\Models\SLAConfiguration;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DocumentSLAService
 {
-    public function applyToDocument(Document $document)
+    /**
+     * Calculate and return SLA timestamps (response and resolution) based on sla_configurations
+     * Falls back to priority.sla_days for resolution if no SLA row found.
+     *
+     * @param int|null $documentTypeId
+     * @param int|null $priorityId
+     * @param \DateTime|string|null $baseAt
+     * @return array ["response_at" => Carbon|null, "resolution_at" => Carbon|null]
+     */
+    public function calculate(?int $documentTypeId, ?int $priorityId, $baseAt = null): array
     {
-        // lookup SLA config: specific type+priority, then priority-only, then priority.sla_days
-        $sla = SLAConfiguration::where(function ($q) use ($document) {
-            $q->where('document_type_id', $document->document_type_id)
-              ->where('document_priority_id', $document->document_priority_id);
-        })->first();
+        $base = Carbon::parse($baseAt ?? now());
 
-        if (!$sla) {
-            $sla = SLAConfiguration::whereNull('document_type_id')
-                ->where('document_priority_id', $document->document_priority_id)
-                ->first();
-        }
+        // Try to find SLA config for type+priority
+        $sla = DB::table('sla_configurations')
+            ->where('is_active', true)
+            ->where(function ($q) use ($documentTypeId, $priorityId) {
+                $q->where(function ($q2) use ($documentTypeId, $priorityId) {
+                    if (!is_null($documentTypeId)) {
+                        $q2->where('document_type_id', $documentTypeId);
+                    } else {
+                        $q2->whereNull('document_type_id');
+                    }
+
+                    if (!is_null($priorityId)) {
+                        $q2->where('priority_id', $priorityId);
+                    } else {
+                        $q2->whereNull('priority_id');
+                    }
+                });
+            })
+            ->orderByRaw('document_type_id IS NULL, priority_id IS NULL')
+            ->first();
 
         if ($sla) {
-            $document->update([
-                'due_date_response' => now()->addHours($sla->response_hours),
-                'due_date_resolution' => now()->addHours($sla->resolution_hours),
-            ]);
-            return;
+            $response = $sla->response_hours ? $base->copy()->addHours($sla->response_hours) : null;
+            $resolution = $sla->resolution_hours ? $base->copy()->addHours($sla->resolution_hours) : null;
+            return ['response_at' => $response, 'resolution_at' => $resolution];
         }
 
-        // fallback to priority's sla_days (in days)
-        if ($document->priority && $document->priority->sla_days) {
-            $document->update([
-                'due_date_response' => now()->addDays($document->priority->sla_days),
-                'due_date_resolution' => now()->addDays($document->priority->sla_days),
-            ]);
+        // Fallback: use priority default days
+        if ($priorityId) {
+            $priority = DB::table('document_priorities')->where('id', $priorityId)->first();
+            if ($priority && $priority->sla_days) {
+                $resolution = $base->copy()->addDays($priority->sla_days);
+                // default response: 24 hours
+                $response = $base->copy()->addHours(24);
+                return ['response_at' => $response, 'resolution_at' => $resolution];
+            }
         }
+
+        return ['response_at' => null, 'resolution_at' => null];
     }
 }

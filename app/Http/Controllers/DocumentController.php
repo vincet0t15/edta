@@ -24,7 +24,40 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request)
     {
         $data = $request->validated();
+
+        // Calculate initial routing and SLA
+        $routingService = new \App\Services\DocumentRoutingService();
+        $slaService = new \App\Services\DocumentSLAService();
+
+        $initialOfficeId = $routingService->findInitialOffice($data['document_type_id'] ?? null);
+        $sla = $slaService->calculate($data['document_type_id'] ?? null, $data['priority_id'] ?? null);
+
+        if ($initialOfficeId) {
+            $data['current_office_id'] = $initialOfficeId;
+        }
+
+        if ($sla['response_at']) {
+            $data['sla_response_due_at'] = $sla['response_at'];
+        }
+
+        if ($sla['resolution_at']) {
+            $data['sla_resolution_due_at'] = $sla['resolution_at'];
+        }
+
+        $data['submitted_at'] = now();
+
         $document = Document::create($data);
+
+        // Create initial assignment if routed
+        if (!empty($initialOfficeId)) {
+            \App\Models\DocumentAssignment::create([
+                'document_id' => $document->id,
+                'office_id' => $initialOfficeId,
+                'assigned_by' => auth()->id(),
+                'assigned_at' => now(),
+                'note' => 'Auto-assigned by routing rule',
+            ]);
+        }
 
         // Log creation
         DocumentLog::create(["document_id" => $document->id, "user_id" => auth()->id(), "action" => "created"]);
