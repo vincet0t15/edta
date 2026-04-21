@@ -18,25 +18,17 @@ class LoginController extends Controller
 
         $login = $request->input('username');
 
-        // Find user by username or email
-        $user = User::where('username', $login)
-            ->orWhere('email', $login)
-            ->first();
+        $user = User::where('username', $login)->first();
 
-        // Check if user exists
         if (!$user) {
             return back()->withErrors(['username' => trans('auth.failed')])->onlyInput('username');
         }
 
-        // Check if account is active
         if (!$user->is_active) {
             return back()->withErrors(['username' => 'This account has been deactivated. Please contact support.'])->onlyInput('username');
         }
 
-        // Attempt authentication
-        $credentials = filter_var($login, FILTER_VALIDATE_EMAIL)
-            ? ['email' => $login, 'password' => $request->input('password')]
-            : ['username' => $login, 'password' => $request->input('password')];
+        $credentials = ['username' => $login, 'password' => $request->input('password')];
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();

@@ -5,38 +5,38 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { update } from '@/routes/password';
+import { passwordResetUpdate } from '@/routes/password';
 
 type Props = {
     token: string;
-    email: string;
+    username: string;
 };
 
-export default function ResetPassword({ token, email }: Props) {
+export default function ResetPassword({ token, username }: Props) {
     return (
         <>
             <Head title="Reset password" />
 
             <Form
-                {...update.form()}
-                transform={(data) => ({ ...data, token, email })}
+                {...passwordResetUpdate.form()}
+                transform={(data) => ({ ...data, token, username })}
                 resetOnSuccess={['password', 'password_confirmation']}
             >
                 {({ processing, errors }) => (
                     <div className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="username">Username</Label>
                             <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                autoComplete="email"
-                                value={email}
+                                id="username"
+                                type="text"
+                                name="username"
+                                autoComplete="username"
+                                value={username}
                                 className="mt-1 block w-full"
                                 readOnly
                             />
                             <InputError
-                                message={errors.email}
+                                message={errors.username}
                                 className="mt-2"
                             />
                         </div>

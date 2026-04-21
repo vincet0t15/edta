@@ -17,14 +17,11 @@ class ResetUserPassword implements ResetsUserPasswords
     {
         Validator::make($input, [
             'token' => ['required', 'string'],
-            'login' => ['required', 'string'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ])->validate();
 
-        // Find user by username or email
-        $user = \App\Models\User::where('username', $input['login'])
-            ->orWhere('email', $input['login'])
-            ->firstOrFail();
+        $user = \App\Models\User::where('username', $input['username'])->firstOrFail();
 
         $user->password = $input['password'];
         $user->save();

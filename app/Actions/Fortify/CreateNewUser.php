@@ -25,14 +25,11 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        // If the frontend does not provide an email, generate a unique placeholder
-        $email = $input['email'] ?? ($input['username'] . '@no-email.local');
-
         return User::create([
             'name' => $input['name'],
             'username' => $input['username'],
             'password' => $input['password'],
-            'is_active' => false, // Set to false by default, admin can activate later
+            'is_active' => false,
         ]);
     }
 }

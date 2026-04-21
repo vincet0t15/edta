@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class PasswordResetLinkController extends Controller
 {
@@ -17,18 +19,22 @@ class PasswordResetLinkController extends Controller
 
         $login = $request->input('login');
 
-        $user = User::where('username', $login)
-            ->orWhere('email', $login)
-            ->first();
+        $user = User::where('username', $login)->first();
 
         if (! $user) {
-            return back()->withErrors(['login' => 'No user found with that username or email']);
+            return back()->withErrors(['login' => 'No user found with that username']);
         }
 
-        $status = Password::sendResetLink(['email' => $user->email]);
+        $token = Str::random(60);
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', __($status))
-            : back()->withErrors(['login' => __($status)]);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['username' => $user->username],
+            [
+                'token' => Hash::make($token),
+                'created_at' => now(),
+            ]
+        );
+
+        return back()->with('status', 'Password reset link has been sent to your registered email.');
     }
 }

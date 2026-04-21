@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login } from '@/routes';
-import { email } from '@/routes/password';
+import { forgotPasswordEmail } from '@/routes/password';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
@@ -21,18 +21,18 @@ export default function ForgotPassword({ status }: { status?: string }) {
             )}
 
             <div className="space-y-6">
-                <Form {...email.form()} transform={(data)=>({login: data.login})}>
+                <Form {...forgotPasswordEmail.form()} transform={(data)=>({login: data.login})}>
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Username or email</Label>
+                                <Label htmlFor="login">Username</Label>
                                 <Input
-                                    id="email"
+                                    id="login"
                                     type="text"
                                     name="login"
                                     autoComplete="off"
                                     autoFocus
-                                    placeholder="username or email"
+                                    placeholder="username"
                                 />
 
                                 <InputError message={errors.login} />
@@ -47,7 +47,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     {processing && (
                                         <LoaderCircle className="h-4 w-4 animate-spin" />
                                     )}
-                                    Email password reset link
+                                    Send password reset link
                                 </Button>
                             </div>
                         </>
@@ -65,5 +65,5 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
 ForgotPassword.layout = {
     title: 'Forgot password',
-    description: 'Enter your email to receive a password reset link',
+    description: 'Enter your username to receive a password reset link',
 };
