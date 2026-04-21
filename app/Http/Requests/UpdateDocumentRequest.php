@@ -6,22 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateDocumentRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize()
     {
-        // allow if user owns the document or has permission - simple rule for now
-        return $this->user() != null;
+        return true;
     }
 
-    public function rules(): array
+    public function rules()
     {
         return [
-            'title' => 'required|string|max:255',
+            'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'document_type_id' => 'nullable|exists:document_types,id',
-            'document_category_id' => 'nullable|exists:document_categories,id',
-            'document_priority_id' => 'nullable|exists:document_priorities,id',
+            'priority_id' => 'nullable|exists:document_priorities,id',
+            'current_office_id' => 'nullable|exists:offices,id',
             'retention_policy_id' => 'nullable|exists:retention_policies,id',
-            'is_public' => 'boolean',
         ];
     }
 }

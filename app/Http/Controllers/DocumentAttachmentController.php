@@ -6,47 +6,41 @@ use App\Http\Requests\UploadAttachmentRequest;
 use App\Models\Document;
 use App\Models\DocumentAttachment;
 use App\Models\DocumentLog;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 
 class DocumentAttachmentController extends Controller
 {
     public function upload(UploadAttachmentRequest $request, Document $document)
     {
-        $this->authorize('update', $document);
-
         $file = $request->file('file');
-        $path = $file->store('documents/' . $document->id, config('filesystems.default'));
+        $path = $file->store('documents/' . $document->id, 'public');
 
         $attachment = DocumentAttachment::create([
             'document_id' => $document->id,
+            'uploaded_by' => auth()->id(),
             'filename' => $file->getClientOriginalName(),
             'path' => $path,
-            'size' => $file->getSize(),
             'mime' => $file->getClientMimeType(),
-            'uploaded_by' => Auth::id(),
+            'size' => $file->getSize(),
         ]);
 
         DocumentLog::create([
             'document_id' => $document->id,
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'action' => 'attachment_uploaded',
-            'payload' => ['attachment_id' => $attachment->id, 'filename' => $attachment->filename],
+            'meta' => json_encode(['attachment_id' => $attachment->id, 'path' => $path]),
         ]);
 
-        return back()->with('success', 'Attachment uploaded.');
+        return back();
     }
 
     public function download(Document $document, DocumentAttachment $attachment)
     {
-        // authorization: user must be able to view the document
-        $this->authorize('view', $document);
-
         if ($attachment->document_id !== $document->id) {
             abort(404);
         }
 
-        return Storage::download($attachment->path, $attachment->filename);
+        // Authorization can be added here
+        return Storage::disk('public')->download($attachment->path, $attachment->filename);
     }
 }

@@ -6,22 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDocumentRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize()
     {
-        return $this->user() != null; // authenticated users only
+        return true; // tighten later with policies
     }
 
-    public function rules(): array
+    public function rules()
     {
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'document_type_id' => 'nullable|exists:document_types,id',
-            'document_category_id' => 'nullable|exists:document_categories,id',
-            'document_priority_id' => 'nullable|exists:document_priorities,id',
+            'priority_id' => 'nullable|exists:document_priorities,id',
+            'current_office_id' => 'nullable|exists:offices,id',
             'retention_policy_id' => 'nullable|exists:retention_policies,id',
-            'is_public' => 'boolean',
-            'submit' => 'nullable|boolean',
         ];
     }
 }

@@ -6,15 +6,15 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UploadAttachmentRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize()
     {
-        return $this->user() != null;
+        return true;
     }
 
-    public function rules(): array
+    public function rules()
     {
         return [
-            'file' => 'required|file|max:10240', // max 10MB
+            'file' => 'required|file|max:10240', // 10MB
         ];
     }
 }

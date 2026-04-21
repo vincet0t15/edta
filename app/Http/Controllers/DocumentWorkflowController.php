@@ -5,102 +5,51 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\DocumentAssignment;
 use App\Models\DocumentLog;
-use App\Models\DocumentStatus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class DocumentWorkflowController extends Controller
 {
-    /**
-     * Handle a status transition or workflow action on a document.
-     * Accepts: to_status (code), note (optional), target_office_id (optional)
-     */
     public function transition(Request $request, Document $document)
     {
-        $this->authorize('update', $document); // will use default policy if present
-
-        $data = $request->validate([
-            'to_status' => 'required|string',
-            'note' => 'nullable|string',
+        $request->validate([
+            'to_status_id' => 'required|exists:document_statuses,id',
             'target_office_id' => 'nullable|exists:offices,id',
+            'note' => 'nullable|string',
         ]);
 
-        $fromStatus = $document->status?->code ?? null;
+        DB::transaction(function () use ($request, $document) {
+            $from = $document->current_status_id;
+            $to = $request->input('to_status_id');
 
-        $toStatus = DocumentStatus::where('code', $data['to_status'])->first();
-        if (!$toStatus) {
-            return redirect()->back()->with('error', 'Invalid target status.');
-        }
+            $document->current_status_id = $to;
 
-        // Define allowed transitions (business rules). Keep conservative defaults.
-        $allowed = [
-            'DRAFT' => ['SUBMITTED', 'DRAFT'],
-            'SUBMITTED' => ['IN_PROGRESS', 'ON_HOLD', 'DRAFT'],
-            'IN_PROGRESS' => ['FOR_REVIEW', 'ON_HOLD', 'IN_PROGRESS'],
-            'FOR_REVIEW' => ['APPROVED', 'REJECTED', 'IN_PROGRESS', 'ON_HOLD'],
-            'ON_HOLD' => ['IN_PROGRESS', 'DRAFT'],
-            'APPROVED' => ['ARCHIVED'],
-            'REJECTED' => ['DRAFT', 'ON_HOLD'],
-            'ARCHIVED' => [],
-        ];
+            if ($request->filled('target_office_id')) {
+                $document->current_office_id = $request->input('target_office_id');
+                $assignment = DocumentAssignment::create([
+                    'document_id' => $document->id,
+                    'office_id' => $request->input('target_office_id'),
+                    'assigned_by' => auth()->id(),
+                    'note' => $request->input('note'),
+                    'assigned_at' => now(),
+                ]);
+            }
 
-        $fromCode = $fromStatus ?? 'DRAFT';
-        $toCode = $toStatus->code;
+            // Set timestamps for responded/resolved
+            // Example logic: if moving out of SUBMITTED set responded_at
+            // (We don't hardcode status codes here; calling code may supply logic later)
 
-        if (!array_key_exists($fromCode, $allowed)) {
-            // allow any transition if unknown from state (be permissive but log)
-            $permitted = true;
-        } else {
-            $permitted = in_array($toCode, $allowed[$fromCode], true);
-        }
-
-        if (!$permitted) {
-            return redirect()->back()->with('error', "Transition from {$fromCode} to {$toCode} is not allowed.");
-        }
-
-        // Apply transition updates
-        $document->current_status_id = $toStatus->id;
-
-        // Set responded_at when moving out of SUBMITTED for the first time
-        if ($fromCode === 'SUBMITTED' && $toCode !== 'SUBMITTED' && !$document->responded_at) {
-            $document->responded_at = now();
-        }
-
-        // Set resolved_at when APPROVED or REJECTED
-        if (in_array($toCode, ['APPROVED', 'REJECTED'], true)) {
-            $document->resolved_at = now();
-        }
-
-        $document->save();
-
-        // If target_office_id provided, create assignment and update current_office
-        $assignment = null;
-        if (!empty($data['target_office_id'])) {
-            $assignment = DocumentAssignment::create([
-                'document_id' => $document->id,
-                'office_id' => $data['target_office_id'],
-                'assigned_by' => Auth::id(),
-                'assigned_at' => now(),
-            ]);
-
-            $document->current_office_id = $assignment->office_id;
             $document->save();
-        }
 
-        // Log the transition
-        DocumentLog::create([
-            'document_id' => $document->id,
-            'user_id' => Auth::id(),
-            'action' => 'transition',
-            'payload' => [
-                'from' => $fromCode,
-                'to' => $toCode,
-                'note' => $data['note'] ?? null,
-                'assignment_id' => $assignment?->id ?? null,
-            ],
-        ]);
+            DocumentLog::create([
+                'document_id' => $document->id,
+                'user_id' => auth()->id(),
+                'action' => 'transition',
+                'meta' => json_encode(['from' => $from, 'to' => $to, 'assignment_id' => $assignment->id ?? null]),
+                'note' => $request->input('note'),
+            ]);
+        });
 
-        return redirect()->back()->with('success', 'Document status updated.');
+        return back();
     }
 }

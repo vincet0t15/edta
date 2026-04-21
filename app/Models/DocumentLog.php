@@ -13,11 +13,12 @@ class DocumentLog extends Model
         'document_id',
         'user_id',
         'action',
-        'payload',
+        'meta',
+        'note',
     ];
 
     protected $casts = [
-        'payload' => 'array',
+        'meta' => 'array',
     ];
 
     public function document()

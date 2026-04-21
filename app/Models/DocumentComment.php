@@ -12,7 +12,7 @@ class DocumentComment extends Model
     protected $fillable = [
         'document_id',
         'user_id',
-        'body',
+        'comment',
     ];
 
     public function document()

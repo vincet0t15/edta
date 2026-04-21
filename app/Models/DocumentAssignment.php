@@ -13,16 +13,12 @@ class DocumentAssignment extends Model
         'document_id',
         'office_id',
         'assigned_by',
+        'note',
         'assigned_at',
-        'read_at',
         'completed_at',
     ];
 
-    protected $casts = [
-        'assigned_at' => 'datetime',
-        'read_at' => 'datetime',
-        'completed_at' => 'datetime',
-    ];
+    protected $dates = ['assigned_at', 'completed_at'];
 
     public function document()
     {
@@ -34,7 +30,7 @@ class DocumentAssignment extends Model
         return $this->belongsTo(Office::class);
     }
 
-    public function assignedBy()
+    public function assigner()
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }

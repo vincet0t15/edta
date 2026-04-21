@@ -11,11 +11,11 @@ class DocumentAttachment extends Model
 
     protected $fillable = [
         'document_id',
+        'uploaded_by',
         'filename',
         'path',
-        'size',
         'mime',
-        'uploaded_by',
+        'size',
     ];
 
     public function document()

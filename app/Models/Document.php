@@ -5,68 +5,42 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
 class Document extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'tracking_number',
         'title',
         'description',
         'document_type_id',
-        'document_category_id',
-        'document_priority_id',
+        'priority_id',
         'current_status_id',
         'current_office_id',
         'retention_policy_id',
-        'created_by',
-        'is_public',
-        'due_date_response',
-        'due_date_resolution',
+        'sla_response_due_at',
+        'sla_resolution_due_at',
+        'submitted_at',
         'responded_at',
         'resolved_at',
-        'metadata',
     ];
 
-    protected $casts = [
-        'is_public' => 'boolean',
-        'metadata' => 'array',
-        'due_date_response' => 'datetime',
-        'due_date_resolution' => 'datetime',
-        'responded_at' => 'datetime',
-        'resolved_at' => 'datetime',
+    protected $dates = [
+        'submitted_at',
+        'responded_at',
+        'resolved_at',
+        'sla_response_due_at',
+        'sla_resolution_due_at',
     ];
 
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            if (empty($model->tracking_number)) {
-                $model->tracking_number = strtoupper('DOC-' . uniqid());
-            }
-            if (empty($model->created_by) && Auth::check()) {
-                $model->created_by = Auth::id();
-            }
-        });
-    }
-
-    // Relationships
     public function type()
     {
         return $this->belongsTo(DocumentType::class, 'document_type_id');
     }
 
-    public function category()
-    {
-        return $this->belongsTo(DocumentCategory::class, 'document_category_id');
-    }
-
     public function priority()
     {
-        return $this->belongsTo(DocumentPriority::class, 'document_priority_id');
+        return $this->belongsTo(DocumentPriority::class, 'priority_id');
     }
 
     public function status()
@@ -91,12 +65,7 @@ class Document extends Model
 
     public function logs()
     {
-        return $this->hasMany(DocumentLog::class);
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(DocumentComment::class);
+        return $this->hasMany(DocumentLog::class)->orderBy('created_at', 'desc');
     }
 
     public function attachments()
